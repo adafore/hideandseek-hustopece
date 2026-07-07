@@ -1,25 +1,21 @@
 {
-  "name": "Hide and Seek Hustopeče",
   "short_name": "HideSeek",
-  "description": "Mobilní hra na schovávanou pro Hustopeče s lobby, rolí hledajících a schovávajících a Firebase synchronizací.",
-  "start_url": "./",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#05050d",
-  "theme_color": "#05050d",
+  "name": "Hide and Seek Hustopeče",
   "icons": [
     {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
+      "src": "icon-192.png",
       "type": "image/png",
-      "purpose": "any maskable"
+      "sizes": "192x192"
     },
     {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
+      "src": "icon-512.png",
       "type": "image/png",
-      "purpose": "any maskable"
+      "sizes": "512x512"
     }
-  ]
+  ],
+  "start_url": ".",
+  "scope": "./",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "theme_color": "#000000"
 }
