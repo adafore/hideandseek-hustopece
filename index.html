@@ -194,9 +194,9 @@ input[type="range"] { width: 100%; accent-color: var(--neon-pink); }
 
 /* ── GAME ── */
 #screen-game { background: var(--bg); }
-#map { position: absolute; inset: 0; bottom: 292px; }
+#map { position: absolute; inset: 0; bottom: 350px; }
 .leaflet-tile-pane { filter: brightness(0.75) saturate(0.7) hue-rotate(10deg); }
-.game-hud { position: absolute; bottom: 0; left: 0; right: 0; height: 292px; background: rgba(5,5,14,0.97); backdrop-filter: blur(24px); border-top: 1px solid rgba(0,212,255,0.12); padding: 12px 12px 8px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; box-shadow: 0 -4px 40px rgba(0,0,0,0.7); }
+.game-hud { position: absolute; bottom: 0; left: 0; right: 0; height: 350px; background: rgba(5,5,14,0.97); backdrop-filter: blur(24px); border-top: 1px solid rgba(0,212,255,0.12); padding: 12px 12px max(10px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 9px; z-index: 1000; box-shadow: 0 -4px 40px rgba(0,0,0,0.7); }
 .hud-top { display: flex; gap: 8px; align-items: center; }
 .hud-stat { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 9px 6px; text-align: center; }
 .hud-stat .val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; }
@@ -205,14 +205,14 @@ input[type="range"] { width: 100%; accent-color: var(--neon-pink); }
 .hud-stat.seeker .val { color: var(--neon-pink); text-shadow: 0 0 12px rgba(255,45,107,0.5); }
 .hud-stat.hider { border-color: rgba(0,212,255,0.2); }
 .hud-stat.hider .val { color: var(--neon-blue); text-shadow: 0 0 12px rgba(0,212,255,0.5); }
-.abilities-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-.ability-btn { flex-shrink: 0; min-width: 86px; min-height: 88px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.09); border-radius: 16px; padding: 10px 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; position: relative; text-align: center; }
+.abilities-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; min-height: 104px; flex-shrink: 0; }
+.ability-btn { flex-shrink: 0; min-width: 94px; min-height: 96px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.09); border-radius: 16px; padding: 11px 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; position: relative; text-align: center; }
 .ability-btn.ready { border-color: var(--neon-pink); background: rgba(255,45,107,0.08); box-shadow: 0 0 14px rgba(255,45,107,0.15); }
 .ability-btn.cooling, .ability-btn.blocked { opacity: 0.4; filter: grayscale(0.6); }
 .ab-icon { font-size: 22px; }
 .ab-name { font-size: 9px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; text-align: center; line-height: 1.18; min-height: 22px; display: flex; align-items: center; justify-content: center; }
 .ab-cd  { font-size: 10px; color: var(--neon-pink); font-weight: 800; }
-.caught-banner { position: absolute; top: 0; left: 0; right: 0; bottom: 292px; background: linear-gradient(135deg, rgba(200,10,50,0.97), rgba(100,0,30,0.97)); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 2000; }
+.caught-banner { position: absolute; top: 0; left: 0; right: 0; bottom: 350px; background: linear-gradient(135deg, rgba(200,10,50,0.97), rgba(100,0,30,0.97)); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 2000; }
 .caught-banner.show { display: flex; animation: caughtIn 0.35s cubic-bezier(0.22,1,0.36,1); }
 @keyframes caughtIn { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: scale(1); } }
 .caught-banner h2 { font-family: 'Bebas Neue', sans-serif; font-size: 80px; color: #fff; text-shadow: 0 0 40px rgba(255,255,255,0.3); }
@@ -338,6 +338,10 @@ input[type="range"] { width: 100%; accent-color: var(--neon-pink); }
   <div class="waiting-role-card" id="host-settings-card">
     <div style="font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">Nastavení hry</div>
     <div class="settings-grid" id="host-settings-controls">
+      <div style="grid-column:1 / -1">
+        <label for="setting-room-name">Název lobby</label>
+        <input class="input-field" id="setting-room-name" type="text" maxlength="32" placeholder="Název lobby" onchange="updateRoomSettings()">
+      </div>
       <div>
         <label for="setting-hide-time">Čas na schování: <span class="range-value" id="hide-time-label">5 minut</span></label>
         <input id="setting-hide-time" type="range" min="1" max="20" step="1" value="5" oninput="updateHideTimeLabel()" onchange="updateRoomSettings()">
@@ -728,6 +732,8 @@ function renderWaiting() {
   document.getElementById("host-settings-controls").style.display = isHost && gameState.phase === "waiting" ? "grid" : "none";
   const hideInput = document.getElementById("setting-hide-time");
   if (hideInput) hideInput.value = settings.hideMinutes;
+  const roomInput = document.getElementById("setting-room-name");
+  if (roomInput) roomInput.value = gameState.name || "";
   updateHideTimeLabel();
   document.querySelectorAll('input[name="cooldown-mode"]').forEach(r => r.checked = r.value === settings.cooldownMode);
   document.getElementById("settings-summary").textContent = `Schování: ${fmtMinutes(settings.hideMinutes)} · cooldown: ${settings.cooldownMode === "short" ? "Krátký" : "Delší"}`;
@@ -736,7 +742,7 @@ function renderWaiting() {
     const roleClass = p.role === "seeker" ? "badge-seeker" : "badge-hider";
     const roleText = p.role === "seeker" ? "🔍 Hledající" : "🏃 Schovávající";
     const host = p.key === gameState.hostKey ? ' <span class="host-badge">HOST</span>' : "";
-    const bg = stale ? ' <span class="host-badge">POZADÍ</span>' : "";
+    const bg = stale ? ' <span class="host-badge">SLABÝ SIGNÁL</span>' : "";
     return `<div class="player-item"><span class="player-name">${esc(p.name)}${host}${bg}</span><span class="player-role-badge ${roleClass}">${roleText}</span></div>`;
   }).join("");
   renderEvents();
@@ -747,6 +753,8 @@ function updateHideTimeLabel() {
 }
 async function updateRoomSettings() {
   if (!isHost || !gameState || gameState.phase !== "waiting") return;
+  const roomName = document.getElementById("setting-room-name")?.value.trim();
+  if (roomName) gameState.name = roomName;
   gameState.settings = {
     hideMinutes: Number(document.getElementById("setting-hide-time").value),
     cooldownMode: document.querySelector('input[name="cooldown-mode"]:checked')?.value || "short"
@@ -844,14 +852,14 @@ function renderActiveLobbies(rooms = null) {
   el.innerHTML = rooms.map(r => {
     const phase = r.phase === "game" ? "Ve hře" : r.phase === "countdown" ? "Startuje" : "Čekárna";
     const players = (r.players || []).map(p => {
-      const offline = now() - (p.lastSeen || 0) > PRESENCE_STALE_AFTER;
+      const offline = false;
       const role = p.role === "seeker" ? "🔍" : "🏃";
       return `<span class="active-lobby-player${offline ? " offline" : ""}">${role} ${esc(p.name)}</span>`;
     }).join("");
     return `<div class="active-lobby-item" onclick="selectLobby('${esc(r.id)}')">
       <div class="active-lobby-top">
         <span class="active-lobby-code">${esc(r.name || "Lobby")}</span>
-        <span class="active-lobby-phase">${phase} · ${(r.players || []).length} hráčů</span>
+        <span class="active-lobby-phase">${phase}</span>
       </div>
       <div class="active-lobby-players">${players || '<span class="active-lobby-player offline">bez hráčů</span>'}</div>
     </div>`;
@@ -867,6 +875,19 @@ function subscribeRoom(id) {
       localStorage.setItem("hs_room_" + id, JSON.stringify(gameState));
       const p = me();
       if (p) myRole = p.role;
+      const activeScreen = document.querySelector(".screen.active")?.id || "";
+      if (gameState.phase === "countdown" && activeScreen !== "screen-countdown" && activeScreen !== "screen-game" && activeScreen !== "screen-end") {
+        startCountdown();
+        return;
+      }
+      if (gameState.phase === "game" && activeScreen !== "screen-game" && activeScreen !== "screen-end") {
+        initGame();
+        return;
+      }
+      if (gameState.phase === "end" && activeScreen !== "screen-end") {
+        showEndScreen(gameState);
+        return;
+      }
       if (document.getElementById("screen-waiting").classList.contains("active")) renderWaiting();
       if (document.getElementById("screen-game").classList.contains("active")) renderGameState();
       if (gameState.phase === "game" && document.getElementById("screen-lobby").classList.contains("active") && p) document.getElementById("btn-rejoin").style.display = "block";
@@ -970,7 +991,8 @@ function renderPlayersOnMap() {
   Object.keys(markers).forEach(k => { if (!visible.find(v => v.id === k)) { map.removeLayer(markers[k]); delete markers[k]; } });
   visible.forEach(v => {
     const color = v.role === "seeker" ? "#ff2d6b" : v.type === "decoy" ? "#ffd447" : "#00d4ff";
-    const icon = L.divIcon({ html: `<div style="width:17px;height:17px;border-radius:50%;background:${color};border:2px solid #fff;"></div><div class="marker-label">${esc(v.name)}</div>`, iconSize: [54,34], iconAnchor: [9,9], className: "" });
+    const label = v.stale ? `${v.name} · poslední GPS` : v.name;
+    const icon = L.divIcon({ html: `<div style="width:17px;height:17px;border-radius:50%;background:${color};border:2px solid #fff;"></div><div class="marker-label">${esc(label)}</div>`, iconSize: [90,34], iconAnchor: [9,9], className: "" });
     if (markers[v.id]) markers[v.id].setLatLng([v.lat, v.lon]);
     else markers[v.id] = L.marker([v.lat, v.lon], { icon }).addTo(map);
   });
@@ -982,13 +1004,13 @@ function visiblePlayers() {
   gameState.players.forEach(p => {
     if (p.key === myKey || !p.lat || !p.lon) return;
     if (myRole === "hider") {
-      if (p.role === "seeker" || p.role === "hider") list.push({ id: p.key, name: p.name, role: p.role, lat: p.lat, lon: p.lon });
+      if (p.role === "seeker" || p.role === "hider") list.push({ id: p.key, name: p.name, role: p.role, lat: p.lat, lon: p.lon, stale: now() - (p.lastSeen || 0) > PRESENCE_STALE_AFTER });
     } else if (p.role === "seeker") {
-      list.push({ id: p.key, name: p.name, role: p.role, lat: p.lat, lon: p.lon });
+      list.push({ id: p.key, name: p.name, role: p.role, lat: p.lat, lon: p.lon, stale: now() - (p.lastSeen || 0) > PRESENCE_STALE_AFTER });
     }
   });
   if (myRole === "hider" && localEffects.seekerRevealUntil > now()) {
-    gameState.players.filter(p => p.role === "seeker" && p.lat).forEach(p => list.push({ id: "seek-" + p.key, name: p.name, role: "seeker", lat: p.lat, lon: p.lon }));
+    gameState.players.filter(p => p.role === "seeker" && p.lat).forEach(p => list.push({ id: "seek-" + p.key, name: p.name, role: "seeker", lat: p.lat, lon: p.lon, stale: now() - (p.lastSeen || 0) > PRESENCE_STALE_AFTER }));
   }
   return list;
 }
