@@ -1,4 +1,4 @@
-const CACHE_NAME = "hideseek-hustopece-v20";
+const CACHE_NAME = "hideseek-hustopece-v21";
 const APP_SHELL = [
   "./",
   "./index.html",
